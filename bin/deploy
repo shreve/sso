@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+cd /root/go/src/github.com/shreve
+
+echo "Installing dependencies"
+grep -hE 'github|golang' *.go | awk '{print $2 " " $1}' | awk '{print $1}' | xargs go get
+
+echo "Compiling program"
+go get github.com/shreve/auth-sso
+
+echo "Refreshing service file"
+systemctl daemon-reload
+
+echo "Testing nginx config"
+sudo service nginx -t
+
+echo "Restarting nginx"
+sudo service nginx restart
+
+echo "Restarting app"
+sudo service auth-sso restart

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"strings"
 	"errors"
 	"database/sql"
@@ -8,6 +9,7 @@ import (
 )
 
 var db *sql.DB
+var db_path = os.Getenv("DATABASE_PATH")
 
 type User struct {
 	Username string

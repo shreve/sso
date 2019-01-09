@@ -4,6 +4,7 @@ After=syslog.target network.target
 
 [Service]
 Type=simple
+EnvironmentFile=/root/auth-sso.env
 WorkingDirectory=/root/go/src/github.com/shreve/auth-sso
 ExecStart=/root/go/bin/auth-sso
 User=root
