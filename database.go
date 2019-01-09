@@ -21,7 +21,7 @@ var UserNotCreated = errors.New("There was a problem creating that user.")
 
 func initDB() {
 	var err error
-	db, err = sql.Open("sqlite3", "/auth.db")
+	db, err = sql.Open("sqlite3", db_path)
 	if err != nil {
 		panic(err)
 	}
