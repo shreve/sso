@@ -2,6 +2,8 @@
 
 cd /root/go/src/github.com/shreve/auth-sso
 
+echo "Updating code"
+git fetch
 git reset --hard origin/master
 
 echo "Installing dependencies"
