@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+grep -hE 'github|golang' *.go | awk '{print $2 " " $1}' | awk '{print $1}' > deps.txt
+
+cat deps.txt | xargs go get

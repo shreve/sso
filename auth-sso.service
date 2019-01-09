@@ -1,0 +1,22 @@
+[Unit]
+Description=auth-sso
+After=syslog.target network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/go/src/github.com/shreve/auth-sso
+ExecStart=/root/go/bin/auth-sso
+User=root
+Group=root
+UMask=0002
+EnvironmentFile=/etc/environment
+
+# Restart on crash, or even if killed safely
+RestartSec=1
+Restart=always
+
+# This will default to "bundler" if we don't specify it
+SyslogIdentifier=auth-sso
+
+[Install]
+WantedBy=multi-user.target
