@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd /root/go/src/github.com/shreve/auth-sso
+cd /root/go/src/github.com/shreve/auth-sso || return
 
 echo "Updating code"
 git fetch
