@@ -39,7 +39,6 @@ var login = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	w.Write(Render(user, nil))
 })
 
-
 func main() {
 	initDB()
 	r := mux.NewRouter()

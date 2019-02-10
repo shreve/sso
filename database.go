@@ -2,16 +2,24 @@ package main
 
 import (
 	"os"
-	"strings"
 	"errors"
+	"strings"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/rs/xid"
 )
 
+func getEnv(key, def string) string {
+	val, ok := os.LookupEnv(key)
+	if !ok { val = def }
+	return val
+}
+
 var db *sql.DB
-var db_path = os.Getenv("DATABASE_PATH")
+var db_path = getEnv("DATABASE_PATH", "./auth.db")
 
 type User struct {
+	Uid string
 	Username string
 	Password string
 }
@@ -31,16 +39,30 @@ func initDB() {
 func createDB() {
 	db.Exec(
 		"create table if not exists users (" +
-			"username text primary key, " +
-			"password text)")
+			"uid text primary key, " +
+			"username text not null, " +
+			"password text not null, " +
+			"created_at date not null default current_timestamp, " +
+			"constraint username_unique unique (username)" +
+		")")
 }
 
-func findUser(username string) (User, error) {
+func findUserByUid(uid string) (User, error) {
+	result := db.QueryRow("select uid, username, password from users where uid = $1", uid)
+	var user User
+	err := result.Scan(&user.Uid, &user.Username, &user.Password)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
+
+func findUserByUsername(username string) (User, error) {
 	result := db.QueryRow(
-		"select username, password from users where lower(username) = $1",
+		"select uid, username, password from users where lower(username) = $2",
 		strings.ToLower(username))
 	var user User
-	err := result.Scan(&user.Username, &user.Password)
+	err := result.Scan(&user.Uid, &user.Username, &user.Password)
 	if err != nil {
 		return user, err
 	}
@@ -48,9 +70,14 @@ func findUser(username string) (User, error) {
 }
 
 func createUser(username, hashed_password string) (User, error) {
-	_, err := db.Exec("insert into users values ($1, $2)", username, hashed_password)
+	id := xid.New()
+	_, err := db.Exec(
+		"insert into users (uid, username, password) values ($1, $2, $3)",
+		id.String(),
+		username,
+		hashed_password)
 	if err != nil {
 		return User{}, err
 	}
-	return findUser(username)
+	return findUserByUid(id.String())
 }

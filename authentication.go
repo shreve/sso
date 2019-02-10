@@ -52,6 +52,7 @@ func compare(hash, password string) error {
 func genToken(user *User) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": user.Username,
+		"uid": user.Uid,
 		"exp": time.Now().Add(time.Hour * 24).Unix(),
 	})
 	tokString, _ := token.SignedString(signingKey)
@@ -59,7 +60,7 @@ func genToken(user *User) string {
 }
 
 func loginUser(creds Credentials) (Token, error) {
-	user, err := findUser(creds.Username)
+	user, err := findUserByUsername(creds.Username)
 	if err != nil {
 		return Token{}, err
 	}
@@ -71,7 +72,7 @@ func loginUser(creds Credentials) (Token, error) {
 }
 
 func registerUser(creds Credentials) (Token, error) {
-	_, err := findUser(creds.Username)
+	_, err := findUserByUsername(creds.Username)
 	if err == nil {
 		return Token{}, AlreadyRegisteredError
 	}
