@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 cd /root/go/src/github.com/shreve/auth-sso || return
+unset GIT_DIR
 
 echo "Updating code"
 git fetch
