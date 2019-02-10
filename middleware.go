@@ -26,6 +26,7 @@ func Logging(f http.Handler) http.Handler {
 		end := time.Now()
 		diff := float64(end.Sub(start)) / float64(time.Microsecond)
 		log.Printf("Completed [%s] %s (%.2f μs)", r.Method, r.URL.Path, diff)
+		log.Printf("")
 	})
 }
 

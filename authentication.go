@@ -2,7 +2,6 @@ package main
 
 import (
 	"io"
-	"os"
 	"time"
 	"errors"
 	"strconv"
@@ -11,8 +10,8 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-var signingKey = []byte(os.Getenv("JWT_SIGNING_KEY"))
-var cost, err = strconv.Atoi(os.Getenv("BCRYPT_COST"))
+var signingKey = []byte(getEnv("JWT_SIGNING_KEY", "jwt signature"))
+var cost, err = strconv.Atoi(getEnv("BCRYPT_COST", "10"))
 
 type Credentials struct {
 	Username string  `json:"username"`
@@ -21,6 +20,7 @@ type Credentials struct {
 
 type Token struct {
 	Token string `json:"token"`
+	User *User `json:"-"`
 }
 
 func (c *Credentials) Validate() error {
@@ -49,14 +49,14 @@ func compare(hash, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 }
 
-func genToken(user *User) string {
+func genToken(user *User) Token {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": user.Username,
 		"uid": user.Uid,
 		"exp": time.Now().Add(time.Hour * 24).Unix(),
 	})
 	tokString, _ := token.SignedString(signingKey)
-	return tokString
+	return Token{tokString, user}
 }
 
 func loginUser(creds Credentials) (Token, error) {
@@ -68,7 +68,7 @@ func loginUser(creds Credentials) (Token, error) {
 	if err != nil {
 		return Token{}, IncorrectPasswordError
 	}
-	return Token{genToken(&user)}, nil
+	return genToken(&user), nil
 }
 
 func registerUser(creds Credentials) (Token, error) {
@@ -84,5 +84,5 @@ func registerUser(creds Credentials) (Token, error) {
 	if err != nil {
 		return Token{}, err
 	}
-	return Token{genToken(&user)}, nil
+	return genToken(&user), nil
 }

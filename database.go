@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"errors"
 	"strings"
 	"database/sql"
@@ -9,22 +8,16 @@ import (
 	"github.com/rs/xid"
 )
 
-func getEnv(key, def string) string {
-	val, ok := os.LookupEnv(key)
-	if !ok { val = def }
-	return val
-}
-
 var db *sql.DB
 var db_path = getEnv("DATABASE_PATH", "./auth.db")
 
 type User struct {
 	Uid string
 	Username string
-	Password string
+	Password string `json:"-"`
 }
 
-var UserNotFound = errors.New("That username has not been claimed.")
+var UserNotFound = errors.New("That user does not exist.")
 var UserNotCreated = errors.New("There was a problem creating that user.")
 
 func initDB() {
@@ -52,7 +45,7 @@ func findUserByUid(uid string) (User, error) {
 	var user User
 	err := result.Scan(&user.Uid, &user.Username, &user.Password)
 	if err != nil {
-		return user, err
+		return user, UserNotFound
 	}
 	return user, nil
 }
@@ -64,7 +57,7 @@ func findUserByUsername(username string) (User, error) {
 	var user User
 	err := result.Scan(&user.Uid, &user.Username, &user.Password)
 	if err != nil {
-		return user, err
+		return user, UserNotFound
 	}
 	return user, nil
 }
@@ -77,7 +70,7 @@ func createUser(username, hashed_password string) (User, error) {
 		username,
 		hashed_password)
 	if err != nil {
-		return User{}, err
+		return User{}, UserNotCreated
 	}
 	return findUserByUid(id.String())
 }
