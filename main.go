@@ -5,13 +5,14 @@ import (
 	"log"
 	"fmt"
 	"time"
+	"errors"
+	"strings"
+	"net/url"
 	"net/http"
+	"text/template"
 
 	"github.com/gorilla/mux"
 )
-
-type StrMap map[string]string;
-type StrListMap map[string][]string;
 
 func getEnv(key, def string) string {
 	val, ok := os.LookupEnv(key)
@@ -20,7 +21,14 @@ func getEnv(key, def string) string {
 }
 
 var domain = getEnv("AUTH_DOMAIN", "localhost")
+var clients = strings.Split(getEnv("CLIENT_DOMAINS", ""), ",")
 var secure = (getEnv("SECURE_ONLY", "true") == "true")
+var NotSignedIn = errors.New("There is not a signed in user.")
+
+type Client struct {
+	Domain string
+	Allowed bool
+}
 
 func writeError(w http.ResponseWriter, err error) bool {
 	if err != nil {
@@ -32,32 +40,69 @@ func writeError(w http.ResponseWriter, err error) bool {
 }
 
 func writeCookie(w http.ResponseWriter, user *User) {
-	expire := time.Now().AddDate(0, 0, 1)
 	cookie := http.Cookie{
 		Name: "uid",
 		Value: user.Uid,
 		Domain: domain,
-		Expires: expire,
+		Expires: time.Now().AddDate(0, 0, 1),
 		Secure: secure,
 		HttpOnly: true,
 	}
 	http.SetCookie(w, &cookie)
 }
 
-var root = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	w.Write(Render(StrMap{"status": "ok"}, nil))
-})
+func clearCookie(w http.ResponseWriter) {
+	cookie := http.Cookie{
+		Name: "uid",
+		Value: "",
+		Domain: domain,
+		Expires: time.Unix(0, 0),
+		Secure: secure,
+		HttpOnly: true,
+	}
+	http.SetCookie(w, &cookie)
+}
 
-var status = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func signedInUser(r *http.Request) (User, error){
 	cookies := r.Cookies()
 	for _, cookie := range cookies {
 		if cookie.Name == "uid" {
-			user, err := findUserByUid(cookie.Value)
-			if writeError(w, err) { return }
-			w.Write(Render(genToken(&user), nil))
-			return
+			return findUserByUid(cookie.Value);
 		}
 	}
+	return User{}, NotSignedIn
+}
+
+func getClient(domain string) Client {
+	c := Client{"", false}
+	u, err := url.Parse(domain)
+	if err != nil { return c }
+	for _, client := range clients {
+		if u.Host == client {
+			c.Allowed = true
+			c.Domain = (&url.URL{
+				Scheme: u.Scheme,
+				Host: u.Host,
+			}).String()
+		}
+	}
+	return c
+}
+
+var root = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	client := getClient(r.Header.Get("Referer"))
+	if ! client.Allowed { return }
+	t, err := template.ParseFiles("tmpl/index.html")
+	// user, err := signedInUser(r)
+	w.Header().Set("Content-Type", "text/html")
+	err = t.Execute(w, client)
+	if writeError(w, err) { return }
+})
+
+var status = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	user, err := signedInUser(r)
+	if writeError(w, err) { return }
+	w.Write(Render(genToken(&user), nil))
 })
 
 var register = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -78,6 +123,10 @@ var login = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	w.Write(Render(token, nil))
 })
 
+var logout = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	clearCookie(w)
+})
+
 func main() {
 	initDB()
 	r := mux.NewRouter()
@@ -86,6 +135,9 @@ func main() {
 	r.Handle("/status", status)
 	r.Handle("/register", register)
 	r.Handle("/login", login)
+	r.Handle("/logout", logout)
+
+	r.PathPrefix("/js/").Handler(http.FileServer(http.Dir("./")))
 
 	req := Middleware().Then(r)
 	log.Println("================================")
