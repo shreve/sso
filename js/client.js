@@ -37,6 +37,7 @@ let SSOperhero = (() => {
   }
 
   let receive_message = (event) => {
+    if (event.origin != opts.provider) return;
     log('[message in]', event)
     switch (event.data.intent) {
     case 'token:set':
