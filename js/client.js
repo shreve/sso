@@ -43,6 +43,7 @@ let SSOperhero = (() => {
     case 'token:set':
       logged_in = localStorage.getItem('token')
       localStorage.setItem('token', event.data.value)
+      SSOperhero.token = event.data.value;
       if (!logged_in) opts.login_success()
       break;
     case 'token:clear':
@@ -95,7 +96,8 @@ let SSOperhero = (() => {
                      password: args.password })
     },
 
-    token: token
+    get_token: token,
+    token: null
   }
 })()
 
