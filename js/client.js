@@ -49,6 +49,7 @@ let SSOperhero = (() => {
     case 'token:clear':
       logged_in = localStorage.getItem('token')
       localStorage.removeItem('token')
+      SSOperhero.token = null;
       if (logged_in) opts.logout_success()
       break;
     case 'error':
@@ -73,6 +74,8 @@ let SSOperhero = (() => {
       window.addEventListener('message', receive_message, false)
 
       add_provider_window();
+
+      SSOperhero.token = localStorage.getItem('token');
     },
 
     logged_in: () => {

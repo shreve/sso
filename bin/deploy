@@ -16,11 +16,8 @@ go get github.com/shreve/auth-sso
 echo "Refreshing service file"
 systemctl daemon-reload
 
-echo "Testing nginx config"
-sudo nginx -t
-
 echo "Restarting nginx"
-sudo service nginx restart
+sudo nginx -t && sudo service nginx restart
 
 echo "Restarting app"
 sudo service auth-sso restart
