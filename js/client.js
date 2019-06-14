@@ -78,6 +78,10 @@ let SSOperhero = (() => {
       SSOperhero.token = localStorage.getItem('token');
     },
 
+    config: (options) => {
+      opts = extend(opts, options)
+    },
+
     logged_in: () => {
       let t = token()
       return !!t && (t.exp * 1000) > (new Date())
