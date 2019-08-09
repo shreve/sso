@@ -130,16 +130,20 @@ var logout = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 func main() {
 	initDB()
 	r := mux.NewRouter()
-
-	r.Handle("/", root)
-	r.Handle("/status", status)
-	r.Handle("/register", register)
-	r.Handle("/login", login)
-	r.Handle("/logout", logout)
-
+	r.Use(Logging)
+	r.Use(CORS)
 	r.PathPrefix("/js/").Handler(http.FileServer(http.Dir("./")))
 
-	req := Middleware().Then(r)
+	s := r.PathPrefix("/").Subrouter()
+	s.Use(ForceJSON)
+
+	s.Handle("/", root)
+	s.Handle("/status", status)
+	s.Handle("/register", register)
+	s.Handle("/login", login)
+	s.Handle("/logout", logout)
+
+
 	log.Println("================================")
 	log.Println("Starting up SSOperhero")
 	log.Println("  domain: \t" + domain)
@@ -150,5 +154,5 @@ func main() {
 	log.Println("Serving on http://localhost:9999")
 	log.Println("================================")
 	log.Println("")
-	http.ListenAndServe(":9999", req)
+	http.ListenAndServe(":9999", r)
 }

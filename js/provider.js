@@ -41,7 +41,7 @@ let SSOperhero = (() => {
     request({
       url: '/status',
       success: send_token,
-      error: send_error
+      error: () => {}
     })
   }
 
@@ -92,11 +92,11 @@ let SSOperhero = (() => {
     case 'token:get':
       request_token();
       break;
-    case 'login':
-      login(event.data);
-      break;
     case 'logout':
       logout();
+      break;
+    case 'login':
+      login(event.data);
       break;
     case 'register':
       register(event.data);
@@ -118,6 +118,7 @@ let SSOperhero = (() => {
     init: options => {
       opts = options
       window.addEventListener('message', receive_message, false)
+      request_token();
     }
   }
 })();

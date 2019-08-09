@@ -51,6 +51,7 @@ func compare(hash, password string) error {
 
 func genToken(user *User) Token {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"source": domain,
 		"username": user.Username,
 		"uid": user.Uid,
 		"exp": time.Now().Add(time.Hour * 24).Unix(),

@@ -4,14 +4,11 @@ import (
 	"log"
 	"time"
 	"net/http"
-
-	"github.com/justinas/alice"
 )
 
 func CORS(f http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*");
-		w.Header().Set("Content-Type", "application/json");
 		w.Header().Set("Access-Control-Allow-Methods", "GET,HEAD,POST,PUT,OPTIONS");
 		if r.Method == "OPTIONS" { return; }
 		f.ServeHTTP(w, r)
@@ -30,13 +27,9 @@ func Logging(f http.Handler) http.Handler {
 	})
 }
 
-func ForceRequest(f http.Handler) http.Handler {
+func ForceJSON(f http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		f.ServeHTTP(w,r)
 	})
-}
-
-func Middleware() alice.Chain {
-	return alice.New(CORS, Logging, ForceRequest)
 }
