@@ -148,7 +148,7 @@ func main() {
 	log.Println("Starting up SSOperhero")
 	log.Println("  domain: \t" + domain)
 	log.Println("  secure: \t" + fmt.Sprintf("%t", secure))
-	log.Println("  db path: \t" + db_path)
+	log.Println("  db: \t" + db_driver + " " + db_url)
 	log.Println("  jwt sig: \t" + string(signingKey))
 	log.Println("  bcrypt: \t" + fmt.Sprintf("%d", cost))
 	log.Println("Serving on http://localhost:9999")

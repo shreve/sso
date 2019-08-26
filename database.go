@@ -5,11 +5,13 @@ import (
 	"strings"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 	"github.com/rs/xid"
 )
 
 var db *sql.DB
-var db_path = getEnv("DATABASE_PATH", "./auth.db")
+var db_url = getEnv("DATABASE_URL", "./auth.db")
+var db_driver = getEnv("DATABASE_DRIVER", "sqlite3")
 
 type User struct {
 	Uid string
@@ -22,7 +24,7 @@ var UserNotCreated = errors.New("There was a problem creating that user.")
 
 func initDB() {
 	var err error
-	db, err = sql.Open("sqlite3", db_path)
+	db, err = sql.Open(db_driver, db_url)
 	if err != nil {
 		panic(err)
 	}
