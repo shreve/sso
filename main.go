@@ -20,6 +20,7 @@ func getEnv(key, def string) string {
 	return val
 }
 
+var port = getEnv("PORT", "9999")
 var domain = getEnv("AUTH_DOMAIN", "localhost")
 var clients = strings.Split(getEnv("CLIENT_DOMAINS", ""), ",")
 var secure = (getEnv("SECURE_ONLY", "true") == "true")
@@ -151,8 +152,8 @@ func main() {
 	log.Println("  db: \t" + db_driver + " " + db_url)
 	log.Println("  jwt sig: \t" + string(signingKey))
 	log.Println("  bcrypt: \t" + fmt.Sprintf("%d", cost))
-	log.Println("Serving on http://localhost:9999")
+	log.Println("Serving on http://localhost:" + port)
 	log.Println("================================")
 	log.Println("")
-	http.ListenAndServe(":9999", r)
+	http.ListenAndServe(":" + port, r)
 }
