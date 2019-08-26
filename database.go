@@ -47,6 +47,7 @@ func findUserByUid(uid string) (User, error) {
 	var user User
 	err := result.Scan(&user.Uid, &user.Username, &user.Password)
 	if err != nil {
+		errlog.Println(err)
 		return user, UserNotFound
 	}
 	return user, nil
@@ -54,11 +55,12 @@ func findUserByUid(uid string) (User, error) {
 
 func findUserByUsername(username string) (User, error) {
 	result := db.QueryRow(
-		"select uid, username, password from users where lower(username) = $2",
+		"select uid, username, password from users where lower(username) = $1",
 		strings.ToLower(username))
 	var user User
 	err := result.Scan(&user.Uid, &user.Username, &user.Password)
 	if err != nil {
+		errlog.Println(err)
 		return user, UserNotFound
 	}
 	return user, nil

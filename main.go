@@ -25,6 +25,7 @@ var domain = getEnv("AUTH_DOMAIN", "localhost")
 var clients = strings.Split(getEnv("CLIENT_DOMAINS", ""), ",")
 var secure = (getEnv("SECURE_ONLY", "true") == "true")
 var NotSignedIn = errors.New("There is not a signed in user.")
+var errlog = log.New(os.Stdout, "error", log.LstdFlags)
 
 type Client struct {
 	Domain string
@@ -33,6 +34,7 @@ type Client struct {
 
 func writeError(w http.ResponseWriter, err error) bool {
 	if err != nil {
+		errlog.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write(Render(nil, err))
 		return true
