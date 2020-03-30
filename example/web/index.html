@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  </head>
+  <body>
+    <h1>SSOperhero</h1>
+    <p id="logged-in">Not sure if you're logged in.</p>
+
+    <form>
+      <label>Log In</label>
+      <input type="text" name="username" value="username"/>
+      <input type="password" name="password" value="password" />
+      <input type="submit" name="log-in" value="Log In" />
+    </form>
+
+    <form>
+      <label>Register</label>
+      <input type="text" name="username" value="username"/>
+      <input type="password" name="password" value="password" />
+      <input type="submit" name="register" value="Register" />
+    </form>
+
+    <form>
+      <input type="submit" name="log-out" value="Log Out" />
+    </form>
+
+    <!-- Client and provider must be on same protocol. Provider is decided by this include. -->
+    <script type="text/javascript" src="//localhost:9999/js/client.js" id="sso-client"></script>
+    <script type="text/javascript">
+     let p = document.getElementById('logged-in')
+     let login = document.forms[0];
+     let register = document.forms[1];
+     let logout = document.forms[2];
+
+     let render = () => {
+       if (SSO.logged_in()) {
+         p.innerText = "You are logged in as " + SSO.get_token().username + "."
+       } else {
+         p.innerText = "You are not logged in."
+       }
+     }
+
+     render()
+
+     SSO.config({
+       login_success: render,
+       logout_success: render,
+       login_expired: render
+     })
+
+     login.addEventListener('submit', function(e) {
+       e.preventDefault();
+       SSO.login({
+         username: this.elements.username.value,
+         password: this.elements.password.value
+       });
+     });
+
+     register.addEventListener('submit', function(e) {
+       e.preventDefault();
+       SSO.register({
+         username: this.elements.username.value,
+         password: this.elements.password.value
+       });
+     });
+
+     logout.addEventListener('submit', function(e) {
+       e.preventDefault();
+       SSO.logout()
+     });
+    </script>
+  </body>
+</html>

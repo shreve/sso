@@ -1,6 +1,6 @@
-let SSOperhero = (() => {
+let SSO = (() => {
   let opts = {}
-  let log = console.log.bind(window.console, '[SSOperhero Provider]')
+  let log = console.log.bind(window.console, '[SSO Provider]')
 
   let request = (opt) => {
     log('[request]', opt)
@@ -84,10 +84,13 @@ let SSOperhero = (() => {
   // Send methods are helpers for request handlers.
   let post_message = (message) => {
     if (!opts.client) { return }
-    window.parent.postMessage(message, opts.client)
+    log('[message out]', message)
+    log('[opts]', opts)
+    window.parent.postMessage(message, window.location.protocol + '//' + opts.client)
   }
 
   let receive_message = (event) => {
+    log('[message in]', event);
     switch (event.data.intent) {
     case 'token:get':
       request_token();
@@ -109,7 +112,6 @@ let SSOperhero = (() => {
   }
 
   let send_error = (data) => {
-    log('[error]', data.error);
     post_message({ intent: 'error', value: data.error })
   }
 

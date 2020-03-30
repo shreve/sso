@@ -1,5 +1,5 @@
-let SSOperhero = (() => {
-  let log = console.log.bind(window.console, '[SSOperhero Client]')
+let SSO = (() => {
+  let log = console.log.bind(window.console, '[SSO Client]')
   if (location.hostname !== 'localhost') { log = () => {} }
 
   let opts = {
@@ -20,8 +20,6 @@ let SSOperhero = (() => {
   let token = () => {
     let t = localStorage.getItem('token')
     if (t) {
-      log('[token]', t)
-
       let bits = t.split('.')
 
       return {
@@ -37,19 +35,21 @@ let SSOperhero = (() => {
   }
 
   let receive_message = (event) => {
-    if (event.origin != opts.provider) return;
     log('[message in]', event)
+    if (event.origin != opts.provider) return;
     switch (event.data.intent) {
     case 'token:set':
       logged_in = localStorage.getItem('token')
+      let old_token = token();
       localStorage.setItem('token', event.data.value)
-      SSOperhero.token = event.data.value;
+      SSO.token = event.data.value;
       if (!logged_in) opts.login_success()
+      if (old_token.uid != token().uid) opts.login_success()
       break;
     case 'token:clear':
       logged_in = localStorage.getItem('token')
       localStorage.removeItem('token')
-      SSOperhero.token = null;
+      SSO.token = null;
       if (logged_in) opts.logout_success()
       break;
     case 'error':
@@ -58,10 +58,10 @@ let SSOperhero = (() => {
   }
 
   let add_provider_window = () => {
-    if (document.getElementById('ssoperhero-provider')) { return }
+    if (document.getElementById('sso-provider')) { return }
 
     provider = document.createElement('iframe')
-    provider.id = 'ssoperhero-provider'
+    provider.id = 'sso-provider'
     provider.src = opts.provider
     provider.style.width = provider.style.height = provider.style.border = '0'
     document.body.appendChild(provider)
@@ -75,7 +75,7 @@ let SSOperhero = (() => {
 
       add_provider_window();
 
-      SSOperhero.token = localStorage.getItem('token');
+      SSO.token = localStorage.getItem('token');
     },
 
     config: (options) => {
@@ -108,5 +108,5 @@ let SSOperhero = (() => {
   }
 })()
 
-url = new URL(document.getElementById('ssoperhero').src)
-SSOperhero.init({ provider: url.origin })
+url = new URL(document.getElementById('sso-client').src)
+SSO.init({ provider: url.origin })

@@ -1,16 +1,51 @@
-package main
+package sso
 
-import "encoding/json"
+import (
+	"log"
+	"time"
+	"net/http"
+	"encoding/json"
+)
 
-type Message struct {
-	Data string `json:"data"`
+func writeError(w http.ResponseWriter, err error) bool {
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(render(nil, err))
+		return true
+	}
+	return false
 }
 
-var errJSON = func(msg string) []byte {
+func writeCookie(w http.ResponseWriter, name, value string) {
+	cookie := http.Cookie{
+		Name: name,
+		Value: value,
+		Domain: config.Domain,
+		Expires: time.Now().AddDate(0, 0, 1),
+		Secure: config.SecureCookies,
+		HttpOnly: true,
+	}
+	http.SetCookie(w, &cookie)
+}
+
+func clearCookie(w http.ResponseWriter, name string) {
+	cookie := http.Cookie{
+		Name: name,
+		Value: "",
+		Domain: config.Domain,
+		Expires: time.Unix(0, 0),
+		Secure: config.SecureCookies,
+		HttpOnly: true,
+	}
+	http.SetCookie(w, &cookie)
+}
+
+func errJSON(msg string) []byte {
 	return []byte("{\"error\": \"" + msg + "\"}")
 }
 
-func Render(obj interface{}, err error) []byte {
+func render(obj interface{}, err error) []byte {
 	if err != nil {
 		return errJSON(err.Error())
 	}

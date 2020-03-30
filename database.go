@@ -1,7 +1,7 @@
-package main
+package sso
 
 import (
-	"errors"
+	"log"
 	"strings"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
@@ -10,21 +10,10 @@ import (
 )
 
 var db *sql.DB
-var db_url = getEnv("DATABASE_URL", "./auth.db")
-var db_driver = getEnv("DATABASE_DRIVER", "sqlite3")
 
-type User struct {
-	Uid string
-	Username string
-	Password string `json:"-"`
-}
-
-var UserNotFound = errors.New("That user does not exist.")
-var UserNotCreated = errors.New("There was a problem creating that user.")
-
-func initDB() {
+func initializeDB(url string) {
 	var err error
-	db, err = sql.Open(db_driver, db_url)
+	db, err = sql.Open("sqlite3", url)
 	if err != nil {
 		panic(err)
 	}
@@ -47,8 +36,8 @@ func findUserByUid(uid string) (User, error) {
 	var user User
 	err := result.Scan(&user.Uid, &user.Username, &user.Password)
 	if err != nil {
-		errlog.Println(err)
-		return user, UserNotFound
+		log.Println(err)
+		return user, UserNotFoundError
 	}
 	return user, nil
 }
@@ -60,8 +49,8 @@ func findUserByUsername(username string) (User, error) {
 	var user User
 	err := result.Scan(&user.Uid, &user.Username, &user.Password)
 	if err != nil {
-		errlog.Println(err)
-		return user, UserNotFound
+		log.Println(err)
+		return user, UserNotFoundError
 	}
 	return user, nil
 }
@@ -74,7 +63,7 @@ func createUser(username, hashed_password string) (User, error) {
 		username,
 		hashed_password)
 	if err != nil {
-		return User{}, UserNotCreated
+		return User{}, UserNotCreatedError
 	}
 	return findUserByUid(id.String())
 }
