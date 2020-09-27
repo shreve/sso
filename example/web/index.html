@@ -37,7 +37,8 @@
 
      let render = () => {
        if (SSO.logged_in()) {
-         p.innerText = "You are logged in as " + SSO.get_token().username + "."
+         p.innerHTML = "You are logged in as " + SSO.get_token().username + "." +
+           "<br>Your token is " + SSO.token;
        } else {
          p.innerText = "You are not logged in."
        }

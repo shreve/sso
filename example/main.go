@@ -1,18 +1,20 @@
 package main
 
 import (
-	"os"
 	"log"
+	"net/http"
+	"os"
 	"strconv"
 	"strings"
-	"net/http"
 
-	"github.com/shreve/sso"
+	"github.com/shreve/sso/sso"
 )
 
 func getEnv(key, def string) string {
 	val, ok := os.LookupEnv(key)
-	if !ok { val = def }
+	if !ok {
+		val = def
+	}
 	return val
 }
 
@@ -29,12 +31,12 @@ func main() {
 	}
 
 	config := sso.Config{
-		Domain: getEnv("AUTH_DOMAIN", "localhost"),
-		Clients: strings.Split(getEnv("CLIENT_DOMAINS", ""), ","),
-		SecureCookies: "true" == getEnv("SECURE_ONLY", "true"),
-		HashCost: cost,
+		Domain:          getEnv("AUTH_DOMAIN", "localhost"),
+		Clients:         strings.Split(getEnv("CLIENT_DOMAINS", "localhost:8000"), ","),
+		SecureCookies:   "true" == getEnv("SECURE_ONLY", "true"),
+		HashCost:        cost,
 		TokenSigningKey: []byte(key),
-		DbUrl: getEnv("DATABASE_URL", "./auth.db"),
+		DbUrl:           getEnv("DATABASE_URL", "./auth.db"),
 	}
 
 	config.Report()
@@ -42,5 +44,5 @@ func main() {
 
 	port := getEnv("PORT", "9999")
 	log.Println("Starting server on :" + port)
-	http.ListenAndServe(":" + port, mux)
+	log.Fatal(http.ListenAndServe(":"+port, mux))
 }
