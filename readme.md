@@ -42,23 +42,25 @@ order to register an account, login, and logout.
        ========                                     ========
 
     ┌─────────────┐                             ┌─────────────┐
-    | 4.          |                             | 3.          |
-    |   App       |    Pre-shared signing key   |   SSO Auth  |
-    |   Server    |<----------------------------|   Server    |
-    |             |                             |             |
-    └─────────────┘                             └─────────────┘
-          ^                                            ^
-          |                                            |
-          |                                            |
-          | JWT                                    Set | Issue
-          | Auth                                Cookie | JWT
-          |                                            |
-          |                                            |
-          |                                            v
-    ┌─────────────┐                             ┌─────────────┐
-    | 1.          |       ┌─────────────┐       | 2.          |
-    |   App       |       |             |       |   SSO       |
-    |   Website   |<----->|   iframe    |<----->|   Website   |
-    |             |       └─────────────┘       |             |
+    │ 4.          │                             │ 3.          │
+    │   App       │    Pre-shared signing key   │   SSO Auth  │
+    │   Server    │<────────────────────────────┤   Server    │
+    │             │                             │             │
+    └─────────────┘                             └───┬─────────┘
+          ^                                         |     ^
+          │                                     Set │     |
+          │                                  Cookie │     |
+          │ JWT                                     │     | Forward
+          │ Auth                              Issue │     | Messages
+          │                                     JWT │     |
+          │                                         │     |
+          │                                         v     |
+    ┌─────┴───────┐                             ┌─────────┴───┐
+    │ 1.          │       ┌─────────────┐       │ 2.          │
+    │   App       │       │             │       │   SSO       │
+    │   Website   │<─────>│   iframe    │<─────>│   Website   │
+    │             │       └─────────────┘       │             │
     └─────────────┘      Passing messages       └─────────────┘
                          via postMessage()
+
+
