@@ -1,18 +1,18 @@
 package sso
 
 import (
+	"crypto/md5"
 	"fmt"
 	"log"
-	"crypto/md5"
 )
 
 type Config struct {
-	Domain string
-	Clients []string
-	SecureCookies bool
-	HashCost int
+	Domain          string
+	Clients         []string
+	SecureCookies   bool
+	HashCost        int
 	TokenSigningKey []byte
-	DbUrl string
+	DbUrl           string
 }
 
 var config *Config
@@ -25,6 +25,6 @@ func (c *Config) Report() {
 	log.Println("  database: \t" + c.DbUrl)
 	log.Println("  bcrypt rounds: \t" + fmt.Sprintf("%d", c.HashCost))
 	log.Println("  signature hash: \t" + fmt.Sprintf("%x", md5.Sum(c.TokenSigningKey)))
-	log.Println("  clients: \t" + fmt.Sprintf("%v", c.Clients))
+	log.Println("  clients: \t\t" + fmt.Sprintf("%v", c.Clients))
 	log.Println("================================")
 }

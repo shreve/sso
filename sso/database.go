@@ -1,12 +1,12 @@
 package sso
 
 import (
+	"database/sql"
+	_ "github.com/lib/pq"
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/rs/xid"
 	"log"
 	"strings"
-	"database/sql"
-	_ "github.com/mattn/go-sqlite3"
-	_ "github.com/lib/pq"
-	"github.com/rs/xid"
 )
 
 var db *sql.DB
@@ -28,7 +28,7 @@ func createDB() {
 			"password text not null, " +
 			"created_at date not null default current_timestamp, " +
 			"constraint username_unique unique (username)" +
-		")")
+			")")
 }
 
 func findUserByUid(uid string) (User, error) {

@@ -1,10 +1,10 @@
 package sso
 
 import (
-	"log"
-	"time"
-	"net/http"
 	"encoding/json"
+	"log"
+	"net/http"
+	"time"
 )
 
 func writeError(w http.ResponseWriter, err error) bool {
@@ -19,11 +19,11 @@ func writeError(w http.ResponseWriter, err error) bool {
 
 func writeCookie(w http.ResponseWriter, name, value string) {
 	cookie := http.Cookie{
-		Name: name,
-		Value: value,
-		Domain: config.Domain,
-		Expires: time.Now().AddDate(0, 0, 1),
-		Secure: config.SecureCookies,
+		Name:     name,
+		Value:    value,
+		Domain:   config.Domain,
+		Expires:  time.Now().AddDate(0, 0, 1),
+		Secure:   config.SecureCookies,
 		HttpOnly: true,
 	}
 	http.SetCookie(w, &cookie)
@@ -31,11 +31,11 @@ func writeCookie(w http.ResponseWriter, name, value string) {
 
 func clearCookie(w http.ResponseWriter, name string) {
 	cookie := http.Cookie{
-		Name: name,
-		Value: "",
-		Domain: config.Domain,
-		Expires: time.Unix(0, 0),
-		Secure: config.SecureCookies,
+		Name:     name,
+		Value:    "",
+		Domain:   config.Domain,
+		Expires:  time.Unix(0, 0),
+		Secure:   config.SecureCookies,
 		HttpOnly: true,
 	}
 	http.SetCookie(w, &cookie)

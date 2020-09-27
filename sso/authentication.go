@@ -1,11 +1,11 @@
 package sso
 
 import (
+	"encoding/json"
+	jwt "github.com/dgrijalva/jwt-go"
+	"golang.org/x/crypto/bcrypt"
 	"io"
 	"time"
-	"encoding/json"
-	"golang.org/x/crypto/bcrypt"
-	jwt "github.com/dgrijalva/jwt-go"
 )
 
 func parseCreds(data io.ReadCloser) (Credentials, error) {
@@ -25,10 +25,10 @@ func compare(hash, password string) error {
 
 func genToken(user *User) Token {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"source": config.Domain,
+		"source":   config.Domain,
 		"username": user.Username,
-		"uid": user.Uid,
-		"exp": time.Now().Add(time.Hour * 24).Unix(),
+		"uid":      user.Uid,
+		"exp":      time.Now().Add(time.Hour * 24).Unix(),
 	})
 	tokString, _ := token.SignedString(config.TokenSigningKey)
 	return Token{tokString, user}

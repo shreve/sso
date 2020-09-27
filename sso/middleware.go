@@ -2,23 +2,25 @@ package sso
 
 import (
 	"log"
-	"time"
 	"net/http"
+	"time"
 
 	"github.com/rs/xid"
 )
 
 func CORS(f http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*");
-		w.Header().Set("Access-Control-Allow-Methods", "GET,HEAD,POST,PUT,OPTIONS");
-		if r.Method == "OPTIONS" { return; }
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET,HEAD,POST,PUT,OPTIONS")
+		if r.Method == "OPTIONS" {
+			return
+		}
 		f.ServeHTTP(w, r)
 	})
 }
 
 type StatusCodeLogger struct {
-	w http.ResponseWriter
+	w    http.ResponseWriter
 	Code int
 }
 
@@ -58,7 +60,7 @@ func ContentType(contentType string) func(http.Handler) http.Handler {
 }
 
 type ContentTypeDetector struct {
-	w http.ResponseWriter
+	w           http.ResponseWriter
 	contentType string
 }
 
