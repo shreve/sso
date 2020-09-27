@@ -12,7 +12,7 @@ Check out the example directory to see how to use it.
 Configuration is currently done by environment variables.
 
 | Variable | Default | Description |
-|----------+---------+-------------|
+|----------|---------|-------------|
 | CLIENT_DOMAINS | | Comma-separated list of domains which are allowed to use this authentication sever |
 | SECURE_ONLY | true | Only include cookies over secure channels (https) |
 | BCRYPT_COST | 10 | Bcrypt cost cycles. This primarily effects how long password hashing takes. Less than 10 becomes too fast (< 50 ms). More than 15 becomes very slow (> 1 s). |
