@@ -3,9 +3,43 @@ SSO
 
 Automatic multi-site single sign on a la Stack Exchange
 
-This library is a proof of concept not yet suitable for production.
+This library is a proof of concept not yet suitable for production. It's API will change.
 
 Check out the example directory to see how to use it.
+
+## Usage
+
+Set up a server like the one in the example directory.
+
+An installable command line utility is in the works.
+
+Then include a script from the server in your client page.
+
+```html
+<script type="text/javascript" src="https://auth.example.com/js/client.js" id="sso-client"></script>
+```
+
+This script, once loaded, will set up the needed iframe and establish
+communication. It will also expose the SSO object on the window.
+
+```javascript
+SSO.login({ username, password })
+
+SSO.register({ username, password })
+
+SSO.logout()
+
+// Configure callbacks
+SSO.config({
+  login_success: render,
+  logout_success: render,
+  login_expired: render
+})
+
+SSO.get_token() // the parsed jwt
+
+SSO.logged_in() // true or false
+```
 
 ## Configuration
 
@@ -64,3 +98,8 @@ order to register an account, login, and logout.
                          via postMessage()
 
 
+## Roadmap
+
+* ES6 module for client
+* Command line tool for running the server
+* Time-based one-time password (totp) support
