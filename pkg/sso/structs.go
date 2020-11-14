@@ -1,5 +1,16 @@
 package sso
 
+type Token struct {
+	Token string `json:"token"`
+	User  *User  `json:"-"`
+}
+
+type User struct {
+	Uid      string
+	Username string
+	Password string `json:"-"`
+}
+
 type Credentials struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
