@@ -47,12 +47,13 @@ Configuration is currently done by environment variables.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| CLIENT_DOMAINS | | Comma-separated list of domains which are allowed to use this authentication sever |
-| SECURE_ONLY | true | Only include cookies over secure channels (https) |
-| BCRYPT_COST | 10 | Bcrypt cost cycles. This primarily effects how long password hashing takes. Less than 10 becomes too fast (< 50 ms). More than 15 becomes very slow (> 1 s). |
+| AUTH_SIGNING_KEY | *required* | The key used to sign JWTs |
+| AUTH_CLIENT_DOMAINS | *required* | Comma-separated list of domains which are allowed to use this authentication sever |
+| AUTH_SECURE_ONLY | true | Only include cookies over secure channels (https) |
+| AUTH_BCRYPT_COST | 10 | Bcrypt cost cycles. This determines how long password hashing takes. Less than 10 becomes too fast (< 50 ms). More than 15 becomes very slow (> 1 s). |
 | AUTH_DOMAIN | localhost | The domain of this server. This appears on cookies and tokens. |
-| DATABASE_URL | ./auth.db | The path of the SQLite database |
-
+| AUTH_PORT | :9999 | The port this server listens on. |
+| AUTH_DATABASE_URL | ./auth.db | The path of the SQLite database |
 
 ## How it works
 

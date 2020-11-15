@@ -40,11 +40,16 @@ func loadConfig() *Config {
 		log.Fatal("Can't run server without a signing key AUTH_SIGNING_KEY.")
 	}
 
+	clients := strings.Split(getEnv("AUTH_CLIENT_DOMAINS", ""), ",")
+	if len(clients) == 0 {
+		log.Fatal("Without clients, the server will not work for anyone.")
+	}
+
 	config := Config{
 		Port:            getEnv("AUTH_PORT", ":9999"),
 		Domain:          getEnv("AUTH_DOMAIN", "localhost"),
 		DbUrl:           getEnv("AUTH_DATABASE_URL", "./auth.db"),
-		Clients:         strings.Split(getEnv("AUTH_CLIENT_DOMAINS", ""), ","),
+		Clients:         clients,
 		SecureCookies:   "true" == getEnv("AUTH_SECURE_ONLY", "true"),
 		HashCost:        cost,
 		TokenSigningKey: []byte(key),

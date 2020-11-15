@@ -1,6 +1,7 @@
 package sso
 
 import (
+	"log"
 	"net/http"
 	"net/url"
 
@@ -9,6 +10,7 @@ import (
 
 func (s *server) routes() {
 	s.router = mux.NewRouter()
+
 	s.router.Use(s.logging)
 	s.router.Use(s.cors)
 
@@ -28,14 +30,15 @@ func (s *server) routes() {
 func (s *server) root(w http.ResponseWriter, r *http.Request) {
 	// Check if this is from an allowed domain
 	client, err := url.Parse(r.Header.Get("Referer"))
-	if !s.clientAllowed(client.String()) {
+	if !s.clientAllowed(client.Host) {
+		log.Println("Client not allowed", client.Host)
 		return
 	}
 
 	// s.render the domain into the script-loader index file
 	if !s.writeError(w, err) {
 		w.Header().Set("Content-Type", "text/html")
-		err = indexView.Execute(w, struct{ Domain string }{client.String()})
+		err = indexView.Execute(w, struct{ Domain string }{client.Host})
 		s.writeError(w, err)
 	}
 }
